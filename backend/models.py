@@ -1,4 +1,5 @@
 from django.db import models
+# Create your models here.
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.models import User
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
@@ -19,12 +20,14 @@ class CustomUserManager(BaseUserManager):
         extra_fields.setdefault('is_superuser', True)
 
         return self.create_user(email, username, password, **extra_fields)
-    
-class User(AbstractBaseUser, PermissionsMixin):
-    email = models.EmailField(unique=True, null=True)
-    username = models.CharField(max_length=200, null=True, unique=True)
-    avatar = models.ImageField(null=False, default='avatar.svg')
 
+class Client(AbstractBaseUser, PermissionsMixin):
+    email = models.EmailField(unique=True, null=True)
+    name = models.CharField(max_length=150, unique=True, null=True)
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
+    avatar = models.ImageField(null=False, default='avatar.svg')
+    is_dark = models.BooleanField(null=False, default=False)
 
     objects = CustomUserManager()
 
@@ -33,19 +36,20 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.email
-class Groups(models.Model):
-    name = models.CharField(max_length=200, null=True)
-    logo = models.ImageField(null=False, default='group.png')
-    participants = models.ManyToManyField(User, related_name='groupons')
+
+
+#--- TASKS MODEL ---
 
 class Task(models.Model):
-    title = models.CharField(max_length=120, null=True)
-    host = models.ForeignKey(User, on_delete=models.CASCADE)
-    flag = models.CharField(max_length=120, null=True)
-    created = models.DateTimeField(auto_now=True)
+    host = models.ForeignKey(Client, on_delete=models.CASCADE, null=True)
+    name = models.CharField(max_length=200, null=True)
+    priority = models.CharField(max_length=120, null=True)
+    submission_date = models.CharField(max_length=300, null=True)
+    uploaded = models.DateTimeField(auto_now=True)
+    flag = models.CharField(max_length=100, null=True)
 
     class Meta:
-        ordering = ['-created']
+        ordering = ['-uploaded']
 
     def __str__(self):
-        return self.title
+        return self.name
