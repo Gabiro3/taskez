@@ -10,3 +10,11 @@ class ClientSerializer(serializers.ModelSerializer):
     class Meta:
         model = Client
         fields = '__all__'
+class GroupSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Group
+        fields = '__all__'
+class InvitationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Invitation
+        fields = '__all__'

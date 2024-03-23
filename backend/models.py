@@ -51,3 +51,13 @@ class Task(models.Model):
 
     def __str__(self):
         return self.name
+
+class Group(models.Model):
+    name = models.CharField(max_length=120, null=True)
+    participants = models.ManyToManyField(Client,related_name='participants')
+    admin = models.ForeignKey(Client, null=True, on_delete=models.CASCADE)
+    created = models.DateTimeField(auto_now=True, null=True)
+class Invitation(models.Model):
+    invitor = models.ForeignKey(Client, on_delete=models.CASCADE, null=True, related_name='invitor')
+    invitee = models.ForeignKey(Client, on_delete=models.CASCADE, null=True, related_name='invitee')
+    accepted = models.BooleanField(null=True)
