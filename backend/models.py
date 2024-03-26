@@ -4,7 +4,6 @@ from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.models import User
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
-
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, username, password=None, **extra_fields):
         if not email:
@@ -52,11 +51,19 @@ class Task(models.Model):
     def __str__(self):
         return self.name
 
+class Activity(models.Model):
+    user = models.ForeignKey(Client, on_delete=models.CASCADE, null=True)
+    tasks = models.ManyToManyField(Task)
+
 class Group(models.Model):
     name = models.CharField(max_length=120, null=True)
-    participants = models.ManyToManyField(Client,related_name='participants')
+    participants = models.ManyToManyField(Client, related_name='participants')
     admin = models.ForeignKey(Client, null=True, on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now=True, null=True)
+    preferences = models.CharField(max_length=120, null=True)# Use JSONField to store preferences
+
+    def __str__(self):
+        return self.name
 class Invitation(models.Model):
     invitor = models.ForeignKey(Client, on_delete=models.CASCADE, null=True, related_name='invitor')
     invitee = models.ForeignKey(Client, on_delete=models.CASCADE, null=True, related_name='invitee')
