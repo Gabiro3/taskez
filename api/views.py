@@ -34,8 +34,8 @@ def update_task(request, pk):
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     # Check if the task's host matches the request user's ID
-    if task.host != request.user.id:
-        return Response({"error": "Unauthorized"}, status=status.HTTP_401_UNAUTHORIZED)
+    # if task.host != request.user.id:
+    #     return Response({"error": "Unauthorized"}, status=status.HTTP_401_UNAUTHORIZED)
 
     if request.method == 'PUT':
         serializer = TaskSerializer(task, data=request.data)
@@ -51,9 +51,6 @@ def delete_task(request, pk):
     except Task.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
-    # Check if the task's host matches the request user's ID
-    if task.host != request.user.id:
-        return Response({"error": "Unauthorized"}, status=status.HTTP_401_UNAUTHORIZED)
 
     if request.method == 'DELETE':
         task.delete()
@@ -86,21 +83,21 @@ def create_group(request):
     
 @api_view(['GET'])
 def get_groups(request):
-    groups = Group.objects.filter(admin=request.user.id)
-    serializer = GroupSerializer(groups)
+    groups = Group.objects.filter(participants=request.user.id)
+    serializer = GroupSerializer(groups, many=True)
     return Response(serializer.data)
 
 @api_view(['PUT'])
 def update_group(request, pk):
+    if request.user.is_anonymous:
+        return Response({"error": "Unauthorized"}, status=status.HTTP_401_UNAUTHORIZED)
     try:
         group = Group.objects.get(pk=pk)
     except Group.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
-    # Check if the group's admin matches the request user's ID
-    if group.admin != request.user.id:
+    if request.user != group.admin:
         return Response({"error": "Unauthorized"}, status=status.HTTP_401_UNAUTHORIZED)
-
     if request.method == 'PUT':
         serializer = GroupSerializer(group, data=request.data)
         if serializer.is_valid():
@@ -116,7 +113,7 @@ def delete_group(request, pk):
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     # Check if the group's admin matches the request user's ID
-    if group.admin != request.user.id:
+    if group.admin != request.user:
         return Response({"error": "Unauthorized"}, status=status.HTTP_401_UNAUTHORIZED)
 
     if request.method == 'DELETE':
@@ -132,7 +129,8 @@ def create_invitation(request):
         invitor_id = request.user.id
         
         # Get the invitee's ID from the request data
-        invitee_id = request.data.get('invitee_id')
+        invitee_id = request.data.get('invitee')
+        get_user = Client.objects.filter(id=invitee_id)
         if not invitee_id:
             return Response({"error": "Invitee ID is required"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -163,3 +161,20 @@ def delete_invitation(request, pk):
     if request.method == 'DELETE':
         invitation.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+
+@api_view(['PUT'])
+def accept_invitation(request, pk):
+    try:
+        invitation = Invitation.objects.get(pk=pk)
+    except Invitation.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    # Check if the invitee matches the request user
+    if invitation.invitee != request.user:
+        return Response({"error": "Unauthorized"}, status=status.HTTP_401_UNAUTHORIZED)
+
+    if request.method == 'PUT':
+        invitation.accepted = True
+        invitation.save()
+        return Response({"message": "Invitation accepted"}, status=status.HTTP_200_OK)

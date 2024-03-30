@@ -44,6 +44,7 @@ class Task(models.Model):
     submission_date = models.CharField(max_length=300, null=True)
     uploaded = models.DateTimeField(auto_now=True)
     flag = models.CharField(max_length=100, null=True)
+    status = models.CharField(max_length=100, null=True, default='Pending')
 
     class Meta:
         ordering = ['-uploaded']
