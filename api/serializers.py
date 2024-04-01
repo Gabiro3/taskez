@@ -9,7 +9,7 @@ class TaskSerializer(serializers.ModelSerializer):
 class ClientSerializer(serializers.ModelSerializer):
     class Meta:
         model = Client
-        fields = '__all__'
+        fields = ['id', 'name', 'avatar']
 class GroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = Group

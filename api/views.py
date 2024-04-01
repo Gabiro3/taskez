@@ -59,9 +59,9 @@ def delete_task(request, pk):
  # -- END OF CRUD OPERATIONS FOR TASKS --#
    
 @api_view(['GET'])
-def getUsers(request):
-    tasks = Client.objects.all()
-    serializer = ClientSerializer(tasks, many=True)
+def getUser(request):
+    user = Client.objects.filter(id=request.user.id)
+    serializer = ClientSerializer(user)
     return Response(serializer.data)
 
 # -- CRUD OPERATIIONS FOR GROUPS -- #
