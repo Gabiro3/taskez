@@ -59,10 +59,13 @@ def delete_task(request, pk):
  # -- END OF CRUD OPERATIONS FOR TASKS --#
    
 @api_view(['GET'])
-def getUser(request):
-    user = Client.objects.filter(id=request.user.id)
-    serializer = ClientSerializer(user)
-    return Response(serializer.data)
+def getUser(request, email):
+    try:
+        user = Client.objects.get(email=email)  # Use get() instead of filter() to get a single instance
+        serializer = ClientSerializer(user)
+        return Response(serializer.data)
+    except Client.DoesNotExist:
+        return Response({"error": "User not found"}, status=404)
 
 # -- CRUD OPERATIIONS FOR GROUPS -- #
 
