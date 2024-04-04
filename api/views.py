@@ -12,6 +12,18 @@ def getTasks(request):
     serializer = TaskSerializer(tasks, many=True)
     return Response(serializer.data)
 
+@api_view(['GET'])
+def getPendingTasks(request):
+    pending_tasks = Task.objects.filter(host=request.user.id, status='Pending')
+    serializer = TaskSerializer(pending_tasks, many=True)
+    return Response(serializer.data)
+
+@api_view(['GET'])
+def getCompletedTasks(request):
+    completed_tasks = Task.objects.filter(host=request.user.id, status='Completed')
+    serializer = TaskSerializer(completed_tasks, many=True)
+    return Response(serializer.data)
+
 @api_view(['POST'])
 def create_task(request):
     if request.method == 'POST':
