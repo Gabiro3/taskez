@@ -58,6 +58,10 @@ class Activity(models.Model):
     name = models.CharField(max_length=100, null=True)
     tasks = models.ManyToManyField(Task, blank=True)
     category = models.CharField(max_length=100, null=True, default='Productivity')
+    uploaded = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering=['-uploaded']
 
 class Group(models.Model):
     name = models.CharField(max_length=120, null=True)
