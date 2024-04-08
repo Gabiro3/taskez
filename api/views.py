@@ -7,10 +7,14 @@ from rest_framework import status
 # -- CRUD OPERATIONS FOR TASKS -- #
 
 @api_view(['GET'])
-def getTasks(request):
-    tasks = Task.objects.filter(host=request.user.id)
-    serializer = TaskSerializer(tasks, many=True)
-    return Response(serializer.data)
+def getTasks(request, activity_id):
+    try:
+        # Assuming activity_id is passed as part of the request
+        tasks = Task.objects.filter(workspace=activity_id, host=request.user.id)
+        serializer = TaskSerializer(tasks, many=True)
+        return Response(serializer.data)
+    except Exception as e:
+        return Response({"error": str(e)}, status=400)
 
 @api_view(['GET'])
 def getPendingTasks(request):

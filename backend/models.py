@@ -57,6 +57,7 @@ class Activity(models.Model):
     user = models.ForeignKey(Client, on_delete=models.CASCADE, null=True)
     name = models.CharField(max_length=100, null=True)
     tasks = models.ManyToManyField(Task, blank=True)
+    category = models.CharField(max_length=100, null=True, default='Productivity')
 
 class Group(models.Model):
     name = models.CharField(max_length=120, null=True)
