@@ -5,6 +5,12 @@ class TaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
         fields = '__all__'
+class ActivitySerializer(serializers.ModelSerializer):
+    tasks = TaskSerializer(many=True, required=False)  # Specify how to serialize tasks
+
+    class Meta:
+        model = Activity
+        fields = '__all__'
 
 class ClientSerializer(serializers.ModelSerializer):
     class Meta:

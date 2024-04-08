@@ -23,6 +23,62 @@ def getCompletedTasks(request):
     completed_tasks = Task.objects.filter(host=request.user.id, status='Completed')
     serializer = TaskSerializer(completed_tasks, many=True)
     return Response(serializer.data)
+@api_view(['POST'])
+def createActivity(request):
+    if request.method == 'POST':
+        data = request.data.copy()
+        
+        # Set the host field to the current user
+        data['user'] = request.user.id # Assuming request.user is the current authenticated user
+
+        # Create a serializer instance with the modified data
+        serializer = ActivitySerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+@api_view(['GET'])
+def getActivities(request):
+    activities = Activity.objects.filter(user=request.user.id).prefetch_related('tasks')
+    serializer = ActivitySerializer(activities, many=True)  # Use many=True for multiple instances
+    return Response(serializer.data)
+@api_view(['PUT'])
+def addTasksToActivity(request, activity_id):
+    try:
+        activity = Activity.objects.get(id=activity_id)
+    except Activity.DoesNotExist:
+        return Response({"error": "Activity not found"}, status=404)
+
+    # Extract task ID from request data
+    task_id = request.data.get('task')
+
+    if task_id is not None:
+        try:
+            task = Task.objects.get(id=task_id)
+        except Task.DoesNotExist:
+            return Response({"error": "Task not found"}, status=404)
+        task.workspace = Activity.objects.get(id=activity_id)  # Assuming workspace is a ForeignKey to Activity
+        task.save() 
+
+        # Add the task to the activity
+        activity.tasks.add(task)
+        activity.save()  # Save the updated activity
+        serialized_activity = ActivitySerializer(activity)
+        return Response(serialized_activity.data)
+    else:
+        return Response({"error": "Task ID is required"}, status=400)
+
+@api_view(['DELETE'])
+def delete_activity(request, pk):
+    try:
+        task = Activity.objects.get(pk=pk)
+    except Task.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+    if request.method == 'DELETE':
+        task.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 @api_view(['POST'])
 def create_task(request):

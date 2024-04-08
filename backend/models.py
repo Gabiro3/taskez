@@ -45,6 +45,7 @@ class Task(models.Model):
     uploaded = models.DateTimeField(auto_now=True)
     flag = models.CharField(max_length=100, null=True)
     status = models.CharField(max_length=100, null=True, default='Pending')
+    workspace = models.ForeignKey('Activity', on_delete=models.CASCADE, null=True)
 
     class Meta:
         ordering = ['-uploaded']
@@ -54,7 +55,8 @@ class Task(models.Model):
 
 class Activity(models.Model):
     user = models.ForeignKey(Client, on_delete=models.CASCADE, null=True)
-    tasks = models.ManyToManyField(Task)
+    name = models.CharField(max_length=100, null=True)
+    tasks = models.ManyToManyField(Task, blank=True)
 
 class Group(models.Model):
     name = models.CharField(max_length=120, null=True)
