@@ -17,14 +17,14 @@ def getTasks(request, activity_id):
         return Response({"error": str(e)}, status=400)
 
 @api_view(['GET'])
-def getPendingTasks(request):
-    pending_tasks = Task.objects.filter(host=request.user.id, status='Pending')
+def getPendingTasks(request, activity_id):
+    pending_tasks = Task.objects.filter(host=request.user.id,workspace=activity_id, status='Pending')
     serializer = TaskSerializer(pending_tasks, many=True)
     return Response(serializer.data)
 
 @api_view(['GET'])
-def getCompletedTasks(request):
-    completed_tasks = Task.objects.filter(host=request.user.id, status='Completed')
+def getCompletedTasks(request, activity_id):
+    completed_tasks = Task.objects.filter(host=request.user.id,workspace=activity_id, status='Completed')
     serializer = TaskSerializer(completed_tasks, many=True)
     return Response(serializer.data)
 @api_view(['POST'])
