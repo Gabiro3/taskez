@@ -24,7 +24,7 @@ class Client(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True, null=True)
     name = models.CharField(max_length=150, unique=True, null=True)
     avatar = models.ImageField(null=False, default='avatar.svg')
-    is_dark = models.BooleanField(null=False, default=False)
+    preferences = models.CharField(max_length=120, null=True)
 
     objects = CustomUserManager()
 

@@ -10,7 +10,7 @@ urlpatterns = [
     path('activities/all', views.getActivities, name='get-activities'),
     path('activities/delete/<str:pk>/', views.delete_activity),
     path('activities/add-task/<str:activity_id>/', views.addTasksToActivity),
-    path('tasks/create-task/', views.create_task),
+    path('tasks/create-task/<int:activity_id>/', views.create_task),
     path('tasks/update-task/<str:pk>/', views.update_task),
     path('tasks/delete-task/<str:pk>/', views.delete_task),
     

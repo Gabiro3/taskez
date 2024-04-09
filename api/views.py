@@ -85,17 +85,25 @@ def delete_activity(request, pk):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 @api_view(['POST'])
-def create_task(request):
+def create_task(request, activity_id):
     if request.method == 'POST':
         data = request.data.copy()
-        
-        # Set the host field to the current user
-        data['host'] = request.user.id # Assuming request.user is the current authenticated user
+        data['host'] = request.user.id  # Assuming request.user is the current authenticated user
+        data['workspace'] = activity_id
 
-        # Create a serializer instance with the modified data
         serializer = TaskSerializer(data=data)
         if serializer.is_valid():
-            serializer.save()
+            task = serializer.save()
+
+            # Update the tasks field of the associated activity
+            try:
+                activity = Activity.objects.get(id=activity_id)
+            except Activity.DoesNotExist:
+                return Response({"error": "Activity not found"}, status=status.HTTP_404_NOT_FOUND)
+
+            activity.tasks.add(task)  # Add the newly created task to the activity's tasks
+            activity.save()  # Save the updated activity
+
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 @api_view(['PUT'])
