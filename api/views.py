@@ -85,10 +85,15 @@ def delete_activity(request, pk):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 @api_view(['POST'])
-def create_task(request, activity_id):
+def create_task(request, activity_name):
     if request.method == 'POST':
         data = request.data.copy()
         data['host'] = request.user.id  # Assuming request.user is the current authenticated user
+        try:
+           activity = Activity.objects.get(name=activity_name)
+           activity_id = activity.id
+        except Activity.DoesNotExist:
+            return Response({"error": "Activity not found"}, status=status.HTTP_404_NOT_FOUND)
         data['workspace'] = activity_id
 
         serializer = TaskSerializer(data=data)
