@@ -4,6 +4,7 @@ from . import views
 urlpatterns = [
     path('users/get-user/<str:email>/', views.getUser, name='get-user'),
     path('users/related-users/', views.getRelatedUsers),
+    path('users/delete-user/<str:pk>/', views.deleteUser),
     path('tasks/all-tasks/<int:activity_id>/', views.getTasks, name='fetch-tasks'),
     path('tasks/pending/', views.getPendingTasks, name='pending-tasks'),
     path('tasks/completed/', views.getCompletedTasks, name='completed-tasks'),

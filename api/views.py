@@ -15,6 +15,13 @@ def getRelatedUsers(request):
         return Response(serializer.data)
     except Exception as e:
         return Response({"error": str(e)}, status=400)
+@api_view(['DELETE'])
+def deleteUser(request, pk):
+    user = Client.objects.get(id=pk)
+    if request.method == 'DELETE':
+        user.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 # -- CRUD OPERATIONS FOR TASKS -- #
 
 @api_view(['GET'])
