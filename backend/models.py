@@ -43,7 +43,6 @@ class Task(models.Model):
     priority = models.CharField(max_length=120, null=True)
     submission_date = models.CharField(max_length=300, null=True)
     uploaded = models.DateTimeField(auto_now=True)
-    flag = models.CharField(max_length=100, null=True)
     status = models.CharField(max_length=100, null=True, default='Pending')
     workspace = models.ForeignKey('Activity', on_delete=models.CASCADE, null=True)
 
