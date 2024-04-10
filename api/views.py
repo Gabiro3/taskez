@@ -4,6 +4,17 @@ from rest_framework.response import Response
 from rest_framework import status
 
 
+
+
+@api_view(['GET'])
+def getRelatedUsers(request):
+    try:
+        # Assuming preferences is a field in the User model
+        related_users = Client.objects.filter(preferences=request.user.preferences)
+        serializer = ClientSerializer(related_users, many=True)
+        return Response(serializer.data)
+    except Exception as e:
+        return Response({"error": str(e)}, status=400)
 # -- CRUD OPERATIONS FOR TASKS -- #
 
 @api_view(['GET'])

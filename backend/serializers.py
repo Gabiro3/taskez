@@ -26,7 +26,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         )
         user.is_staff = validated_data.get("is_staff", False)
         user.is_active = validated_data.get("is_active", True)
-        user.avatar = validated_data.get("avatar", "avatar.svg")
+        user.avatar = validated_data.get("avatar", "profile.png")
         user.save()
         return user
 
