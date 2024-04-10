@@ -23,7 +23,7 @@ class CustomUserManager(BaseUserManager):
 class Client(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True, null=True)
     name = models.CharField(max_length=150, unique=True, null=True)
-    avatar = models.ImageField(null=False, default='avatar.svg')
+    avatar = models.ImageField(null=False, default='profile.png')
     preferences = models.CharField(max_length=120, null=True)
 
     objects = CustomUserManager()
