@@ -284,3 +284,23 @@ def accept_invitation(request, pk):
         invitation.accepted = True
         invitation.save()
         return Response({"message": "Invitation accepted"}, status=status.HTTP_200_OK)
+    
+
+@api_view(['PUT'])
+def update_user(request):
+    try:
+        user = Client.objects.get(id=request.user.id)
+    except Client.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    # Check if the user is updating their own profile (optional)
+    # if user.id != request.user.id:
+    #     return Response({"error": "Unauthorized"}, status=status.HTTP_401_UNAUTHORIZED)
+
+    if request.method == 'PUT':
+        serializer = ClientSerializer(user, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+      
