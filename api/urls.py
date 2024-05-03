@@ -8,8 +8,8 @@ urlpatterns = [
     path('users/update-profile/', views.update_user),
 
     path('tasks/all-tasks/<int:activity_id>/', views.getTasks, name='fetch-tasks'),
-    path('tasks/pending/', views.getPendingTasks, name='pending-tasks'),
-    path('tasks/completed/', views.getCompletedTasks, name='completed-tasks'),
+    path('tasks/pending/<int:activity_id>/', views.getPendingTasks, name='pending-tasks'),
+    path('tasks/completed/<int:activity_id>/', views.getCompletedTasks, name='completed-tasks'),
     path('activities/create-activity', views.createActivity, name='create-activity'),
     path('activities/all', views.getActivities, name='get-activities'),
     path('activities/delete/<str:pk>/', views.delete_activity),
