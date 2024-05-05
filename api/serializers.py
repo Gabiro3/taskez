@@ -15,7 +15,7 @@ class ActivitySerializer(serializers.ModelSerializer):
 class ClientSerializer(serializers.ModelSerializer):
     class Meta:
         model = Client
-        fields = ['id', 'name', 'avatar', 'groups', 'preferences']
+        fields = ['id', 'name', 'email' , 'avatar', 'groups', 'preferences']
 class GroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = Group
