@@ -4,6 +4,7 @@ from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.models import User
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
+from datetime import date
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, username, password=None, **extra_fields):
         if not email:
@@ -45,6 +46,7 @@ class Task(models.Model):
     uploaded = models.DateTimeField(auto_now=True)
     status = models.CharField(max_length=100, null=True, default='Pending')
     workspace = models.ForeignKey('Activity', on_delete=models.CASCADE, null=True)
+    completed = models.DateTimeField(null=True, blank=True)  # New field for completion timestamp
 
     class Meta:
         ordering = ['-uploaded']
@@ -64,7 +66,7 @@ class Activity(models.Model):
 
 class Group(models.Model):
     name = models.CharField(max_length=120, null=True)
-    participants = models.ManyToManyField(Client, related_name='participants')
+    participants = models.ManyToManyField(Client, related_name='participants', null=True)
     admin = models.ForeignKey(Client, null=True, on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now=True, null=True)
     preferences = models.CharField(max_length=120, null=True)# Use JSONField to store preferences
@@ -75,3 +77,10 @@ class Invitation(models.Model):
     invitor = models.ForeignKey(Client, on_delete=models.CASCADE, null=True, related_name='invitor')
     invitee = models.ForeignKey(Client, on_delete=models.CASCADE, null=True, related_name='invitee')
     accepted = models.BooleanField(null=True)
+
+class Progress(models.Model):
+    day = models.DateField(default=date.today, unique=True)
+    success_rate = models.FloatField()
+
+    def __str__(self):
+        return f"{self.day} - Success Rate: {self.success_rate}%"

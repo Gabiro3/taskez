@@ -179,6 +179,7 @@ def create_group(request):
         
         # Set the admin field to the current user
         data['admin'] = request.user.id  # Assuming request.user is the current authenticated user
+        data['participants'] = request.user.id
 
         # Create a serializer instance with the modified data
         serializer = GroupSerializer(data=data)
@@ -189,9 +190,13 @@ def create_group(request):
     
 @api_view(['GET'])
 def get_groups(request):
-    groups = Group.objects.filter(participants=request.user.id)
-    serializer = GroupSerializer(groups, many=True)
-    return Response(serializer.data)
+    try:
+        user_groups = Group.objects.filter(participants=request.user.id)
+
+        serializer = GroupSerializer(user_groups, many=True)
+        return Response(serializer.data)
+    except Exception as e:
+        return Response({"error": str(e)}, status=400)
 
 @api_view(['PUT'])
 def update_group(request, pk):
@@ -303,4 +308,91 @@ def update_user(request):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+#########################################################################
+#------- ANALYTICS SECTION --------#####
+@api_view(['GET'])
+def get_activity_completion_rate(request, activity_id):
+    activity = Activity.objects.get(pk=activity_id)
+    total_tasks = Task.objects.filter(activity=activity).count()
+    completed_tasks = Task.objects.filter(activity=activity, status='Completed').count()
+    if total_tasks > 0:
+        completion_rate = (completed_tasks / total_tasks) * 100
+    else:
+        completion_rate = 0
+    return Response({"Completion Rate": completion_rate}, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def get_task_priority_completion_rate():
+    priority_completion_rates = {}
+    priorities = ['Low', 'Medium', 'High']
+
+    for priority in priorities:
+        total_tasks = Task.objects.filter(priority=priority).count()
+        completed_tasks = Task.objects.filter(priority=priority, completed=True).count()
+        if total_tasks > 0:
+            completion_rate = (completed_tasks / total_tasks) * 100
+        else:
+            completion_rate = 0
+        priority_completion_rates[priority] = completion_rate
+
+    return Response({"Priority Rate": priority_completion_rates}, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def daily_success_rate():
+    today = date.today()
+    completed_tasks_count = Task.objects.filter(completed__date=today).count()
+    total_tasks_count = Task.objects.filter(submission_date=today).count()  # Assuming submission_date stores date only
+
+    if total_tasks_count > 0:
+        success_rate = (completed_tasks_count / total_tasks_count) * 100
+    else:
+        success_rate = 0
+
+    # Store the success rate in Progress model
+    progress, created = Progress.objects.get_or_create(day=today)
+    progress.success_rate = success_rate
+    progress.save()
+
+    return Response({"Success Rate": progress}, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def get_chat_users(request):
+    try:
+        # Fetch invitees whose invitations have been accepted by the request user
+        accepted_invitations = Invitation.objects.filter(invitor=request.user, accepted=True)
+        invitee_users = [invitation.invitee for invitation in accepted_invitations]
+
+        serializer = ClientSerializer(invitee_users, many=True)
+        return Response(serializer.data)
+    except Exception as e:
+        return Response({"error": str(e)}, status=400)
+    
+@api_view(['GET'])
+def get_group_participants(request, group_id):
+    try:
+        group = Group.objects.get(pk=group_id)
+        participants = group.participants.all()[:5]  # Get the first five participants
+        participants_count = group.participants.count()
+
+        # Serialize participants along with their profiles
+        serialized_participants = []
+        for participant in participants:
+            participant_data = {
+                "username": participant.name,
+                "avatar": ClientSerializer(participant).data['avatar']
+                 
+            }
+            serialized_participants.append(participant_data)
+
+        response_data = {
+            "group_name": group.name,
+            "participants": serialized_participants,
+            "total_participants": participants_count,
+        }
+
+        return Response(response_data)
+    except Exception as e:
+        return Response({"error": str(e)}, status=400)
       
