@@ -66,7 +66,7 @@ class Activity(models.Model):
 
 class Group(models.Model):
     name = models.CharField(max_length=120, null=True)
-    participants = models.ManyToManyField(Client, related_name='participants', null=True)
+    participants = models.ManyToManyField(Client, related_name='participants')
     admin = models.ForeignKey(Client, null=True, on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now=True, null=True)
     preferences = models.CharField(max_length=120, null=True)# Use JSONField to store preferences
@@ -80,7 +80,7 @@ class Invitation(models.Model):
 
 class Progress(models.Model):
     day = models.DateField(default=date.today, unique=True)
-    success_rate = models.FloatField()
+    success_rate = models.IntegerField(null=True)
 
     def __str__(self):
         return f"{self.day} - Success Rate: {self.success_rate}%"

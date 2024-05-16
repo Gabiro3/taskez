@@ -340,13 +340,13 @@ def get_task_priority_completion_rate():
     return Response({"Priority Rate": priority_completion_rates}, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
-def daily_success_rate():
+def daily_success_rate(request):
     today = date.today()
     completed_tasks_count = Task.objects.filter(completed__date=today).count()
     total_tasks_count = Task.objects.filter(submission_date=today).count()  # Assuming submission_date stores date only
 
     if total_tasks_count > 0:
-        success_rate = (completed_tasks_count / total_tasks_count) * 100
+        success_rate = (round(completed_tasks_count / total_tasks_count)) * 100
     else:
         success_rate = 0
 
@@ -354,8 +354,9 @@ def daily_success_rate():
     progress, created = Progress.objects.get_or_create(day=today)
     progress.success_rate = success_rate
     progress.save()
+    serializer = ProgressSerializer(progress)
 
-    return Response({"Success Rate": progress}, status=status.HTTP_200_OK)
+    return Response({"Success Rate": serializer.data}, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 def get_chat_users(request):
