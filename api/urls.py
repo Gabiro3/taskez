@@ -19,7 +19,7 @@ urlpatterns = [
     path('tasks/create-task/<str:activity_name>/', views.create_task),
     path('tasks/update-task/<str:pk>/', views.update_task),
     path('tasks/delete-task/<str:pk>/', views.delete_task),
-    path('tasks/completed', views.getCompletedTasks),
+    path('tasks/completed', views.getTotalCompletedTasks),
     path('tasks/pending', views.getTotalPendingTasks),
     
     path('groups/user-groups', views.get_groups, name='get-groups'),
