@@ -35,6 +35,26 @@ def getTasks(request, activity_id):
         return Response({"error": str(e)}, status=400)
 
 @api_view(['GET'])
+def getcompletedTasks(request):
+    try:
+        # Assuming activity_id is passed as part of the request
+        tasks = Task.objects.filter(status='Completed', host=request.user.id)
+        serializer = TaskSerializer(tasks, many=True)
+        return Response(serializer.data)
+    except Exception as e:
+        return Response({"error": str(e)}, status=400)
+    
+@api_view(['GET'])
+def getPendingTasks(request):
+    try:
+        # Assuming activity_id is passed as part of the request
+        tasks = Task.objects.filter(status='Pending', host=request.user.id)
+        serializer = TaskSerializer(tasks, many=True)
+        return Response(serializer.data)
+    except Exception as e:
+        return Response({"error": str(e)}, status=400)
+
+@api_view(['GET'])
 def getPendingTasks(request, activity_id):
     pending_tasks = Task.objects.filter(host=request.user.id,workspace=activity_id, status='Pending')
     serializer = TaskSerializer(pending_tasks, many=True)

@@ -81,6 +81,14 @@ class Invitation(models.Model):
 class Progress(models.Model):
     day = models.DateField(default=date.today, unique=True)
     success_rate = models.IntegerField(null=True)
-
     def __str__(self):
         return f"{self.day} - Success Rate: {self.success_rate}%"
+
+class Notification(models.Model):
+    title = models.CharField(max_length=100, null=True)
+    sender = models.ForeignKey(Client, on_delete=models.SET_NULL, null=True, related_name='sender')
+    receiver = models.ForeignKey(Client, on_delete=models.SET_NULL, null=True, related_name='receiver')
+    timestamp = models.DateTimeField(auto_now=True, null=True)
+
+    class Meta:
+        ordering=['-timestamp']
