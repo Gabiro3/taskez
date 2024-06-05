@@ -45,7 +45,7 @@ def getcompletedTasks(request):
         return Response({"error": str(e)}, status=400)
     
 @api_view(['GET'])
-def getPendingTasks(request):
+def getTotalPendingTasks(request):
     try:
         # Assuming activity_id is passed as part of the request
         tasks = Task.objects.filter(status='Pending', host=request.user.id)
