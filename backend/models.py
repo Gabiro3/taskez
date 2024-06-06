@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
 from datetime import date
+import datetime
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, username, password=None, **extra_fields):
         if not email:
@@ -46,7 +47,7 @@ class Task(models.Model):
     uploaded = models.DateTimeField(auto_now=True)
     status = models.CharField(max_length=100, null=True, default='Pending')
     workspace = models.ForeignKey('Activity', on_delete=models.CASCADE, null=True)
-    completed = models.DateTimeField(null=True, blank=True)  # New field for completion timestamp
+    completed = models.DateTimeField(null=True, blank=True, default=datetime.datetime(1970, 1, 1, 0, 0))  # New field for completion timestamp
 
     class Meta:
         ordering = ['-uploaded']
