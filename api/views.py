@@ -127,28 +127,25 @@ def create_task(request, activity_name):
     if request.method == 'POST':
         data = request.data.copy()
         data['host'] = request.user.id  # Assuming request.user is the current authenticated user
-        try:
-           activity = Activity.objects.get(name=activity_name)
-           activity_id = activity.id
-        except Activity.DoesNotExist:
+        activities = Activity.objects.filter(name=activity_name)
+        
+        if not activities.exists():
             return Response({"error": "Activity not found"}, status=status.HTTP_404_NOT_FOUND)
-        data['workspace'] = activity_id
+        
+        activity = activities.first()
+        data['workspace'] = activity.id
 
         serializer = TaskSerializer(data=data)
         if serializer.is_valid():
             task = serializer.save()
 
             # Update the tasks field of the associated activity
-            try:
-                activity = Activity.objects.get(id=activity_id)
-            except Activity.DoesNotExist:
-                return Response({"error": "Activity not found"}, status=status.HTTP_404_NOT_FOUND)
-
             activity.tasks.add(task)  # Add the newly created task to the activity's tasks
             activity.save()  # Save the updated activity
 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 @api_view(['PUT'])
 def update_task(request, pk):
     try:
